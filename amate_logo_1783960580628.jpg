@@ -1,0 +1,164 @@
+import { 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  User as FirebaseUser
+} from "firebase/auth";
+import { 
+  doc, 
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "firebase/firestore";
+import { auth, db } from "../../config/firebase";
+
+// Definición de Roles del Sistema IPS/EPS
+export type UserRole = "superadmin" | "psicologo" | "paciente";
+
+export interface PsychologyUser {
+  uid: string;
+  email: string | null;
+  name: string;
+  role: UserRole;
+  createdAt: any;
+  updatedAt: any;
+  status: "active" | "inactive";
+  // Campos opcionales específicos
+  psychologistId?: string; // Si es paciente, su psicólogo asignado
+  specialty?: string;      // Si es psicólogo, su especialidad
+  idNumber?: string;       // Documento de identidad
+  clinicId?: string;       // ID de la clínica en el SaaS multi-inquilino
+}
+
+export interface LoginResult {
+  user: FirebaseUser;
+  profile: PsychologyUser;
+  redirectPath: string;
+}
+
+/**
+ * Determina la ruta de redirección según el rol del usuario
+ */
+export function getRedirectPath(role: UserRole): string {
+  switch (role) {
+    case "superadmin":
+      return "/dashboard/superadmin";
+    case "psicologo":
+      return "/dashboard/psicologo";
+    case "paciente":
+      return "/dashboard/paciente";
+    default:
+      return "/login";
+  }
+}
+
+/**
+ * Inicia sesión con email y contraseña, recupera el rol de Firestore
+ * y determina la redirección correspondiente.
+ */
+export async function loginWithEmailAndPassword(
+  email: string, 
+  pass: string
+): Promise<LoginResult> {
+  try {
+    // 1. Autenticar con Firebase Auth
+    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+    const user = userCredential.user;
+
+    // 2. Buscar el perfil del usuario en Firestore para verificar el rol
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      // Si el documento no existe, cerramos sesión por seguridad para no dejar un estado inconsistente
+      await signOut(auth);
+      throw new Error("El perfil del usuario no existe en la base de datos de la IPS.");
+    }
+
+    const userData = userDocSnap.data() as PsychologyUser;
+
+    if (userData.status === "inactive") {
+      await signOut(auth);
+      throw new Error("El usuario se encuentra inactivo. Contacte al administrador.");
+    }
+
+    // 3. Retornar el resultado completo con la ruta de redirección calculada
+    return {
+      user,
+      profile: {
+        ...userData,
+        uid: user.uid,
+      },
+      redirectPath: getRedirectPath(userData.role),
+    };
+  } catch (error: any) {
+    console.error("Error en loginWithEmailAndPassword:", error);
+    // Personalización de mensajes comunes de Firebase Auth
+    let friendlyMessage = error.message;
+    if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+      friendlyMessage = "Credenciales incorrectas. Verifique su correo y contraseña.";
+    } else if (error.code === "auth/too-many-requests") {
+      friendlyMessage = "Demasiados intentos fallidos. Su cuenta ha sido bloqueada temporalmente.";
+    }
+    throw new Error(friendlyMessage);
+  }
+}
+
+/**
+ * Cierra la sesión del usuario actual
+ */
+export async function logout(): Promise<void> {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    throw error;
+  }
+}
+
+/**
+ * Escucha cambios en el estado de autenticación de Firebase
+ */
+export function subscribeToAuthChanges(
+  callback: (user: FirebaseUser | null, role: UserRole | null) => void
+): () => void {
+  return onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const userDocSnap = await getDoc(doc(db, "users", user.uid));
+        if (userDocSnap.exists()) {
+          const profile = userDocSnap.data() as PsychologyUser;
+          callback(user, profile.role);
+        } else {
+          callback(user, null);
+        }
+      } catch (error) {
+        console.error("Error al obtener rol en cambio de estado:", error);
+        callback(user, null);
+      }
+    } else {
+      callback(null, null);
+    }
+  });
+}
+
+/**
+ * Función auxiliar para registrar usuarios e inicializar su perfil con un rol (Exclusivo Superadmin/Procesos internos)
+ */
+export async function createUserProfile(
+  uid: string, 
+  profileData: Omit<PsychologyUser, "uid" | "createdAt" | "updatedAt">
+): Promise<void> {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    await setDoc(userDocRef, {
+      ...profileData,
+      uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error al crear el perfil de usuario:", error);
+    throw error;
+  }
+}

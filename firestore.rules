@@ -1,0 +1,129 @@
+// Definición de Roles del Sistema IPS Multi-inquilino
+export type UserRole = "superadmin" | "psicologo" | "paciente";
+
+export interface Clinic {
+  id: string;
+  name: string;
+  logoType: "icon" | "uploaded";
+  logoIcon: string; // e.g. 'Activity', 'Sparkles', 'Heart', 'Brain'
+  logoColor: string; // Tailwind class
+  logoBase64?: string; // Uploaded custom logo Base64
+  status: "active" | "inactive" | "legal_only"; // Included legal_only status for emergency judicial mode
+  themeColor: "emerald" | "indigo" | "rose" | "cyan" | "amber" | "violet";
+  country: string; // e.g., "Colombia", "Estados Unidos", "México", "España"
+  currency: string; // e.g., "COP", "USD", "MXN", "EUR"
+  nequiPhone: string;
+  nequiHolder: string;
+  daviplataPhone: string;
+  daviplataHolder: string;
+  bancolombiaAccount: string;
+  bancolombiaHolder: string;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  name: string;
+  phone: string;
+  role: UserRole;
+  clinicId: string; // Multi-tenant link
+  status: "active" | "inactive";
+  avatar?: string; // profile picture Base64 or placeholder url
+  specialty?: string; // e.g., "Psicólogo Clínico", "Cardiólogo", "Fisioterapeuta"
+  profType?: "Médico" | "Psicólogo" | "Entrenador Físico" | "Odontólogo" | "Fisioterapeuta" | "Otro";
+  professionalLicense?: string; // Registro profesional, e.g., RETHUS en Colombia, NPI en EE.UU., Cédula Profesional en México
+  assignedLocationId?: string; // Sede física asignada para consultas presenciales
+  assignedConsultorio?: string; // Consultorio físico asignado
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Location {
+  id: string;
+  clinicId: string;
+  name: string;
+  address: string;
+  city: string;
+  consultorios: string[]; // e.g., ["Consultorio 101", "Consultorio 102"]
+}
+
+export interface TenantConfig {
+  id: string; // typically clinicId
+  clinicId: string;
+  monetizationMode: "fixed_fee" | "commission_percentage" | "fixed_per_session";
+  fixedFeeAmount: number; // monthly fixed fee in USD
+  commissionPercentage: number; // e.g., 12%
+  fixedPerSessionAmount: number; // e.g., $5.00 USD per session
+  paymentRoute: "direct" | "centralized"; // central account or direct clinic account
+  status: "active" | "suspended" | "legal_only";
+  commissionMethod?: "PayPal" | "Stripe" | "PSE"; // Selected transfer method to superadmin
+  updatedAt: string;
+}
+
+export interface FinancialRecord {
+  id: string;
+  clinicId: string;
+  appointmentId: string;
+  patientName: string;
+  totalAmount: number; // In clinic's local currency
+  totalAmountUSD?: number; // Converted for master dashboard
+  paymentRoute: "direct" | "centralized";
+  monetizationMode: "fixed_fee" | "commission_percentage" | "fixed_per_session";
+  calculatedCommission: number; // In clinic's local currency
+  calculatedCommissionUSD?: number; // In USD
+  netClinicBalance: number; // In local currency
+  netClinicBalanceUSD?: number; // In USD
+  payoutStatus: "liquidado" | "pendiente_payout" | "facturado_mes" | "pendiente_aprobacion";
+  createdAt: string;
+  surchargeAmount?: number; // Bank transfer surcharge in local currency
+}
+
+export interface Appointment {
+  id: string;
+  clinicId: string; // Multi-tenant link
+  patientId: string;
+  patientName: string;
+  patientPhone: string;
+  psychologistId: string;
+  psychologistName: string;
+  date: string;
+  time: string;
+  modality?: "Virtual" | "Presencial";
+  channel?: "WhatsApp" | "Google Meet" | "Llamada Telefónica";
+  locationId?: string;
+  locationName?: string;
+  locationAddress?: string;
+  locationCity?: string;
+  consultorio?: string;
+  paymentMethod: "manual_nequi" | "manual_daviplata" | "manual_bancolombia" | "automatic_pse" | "automatic_card";
+  paymentStatus: "Pendiente de Verificación" | "Confirmada" | "Rechazada";
+  status: "Agendada" | "Pendiente de Reasignación" | "Reasignada" | "Realizada"; // Appointment clinical/assignment status
+  saasCommissionStatus?: "pendiente" | "pagado" | "aprobado"; // Activation by session: only approved allows appointment access
+  changeRequested?: boolean;
+  changeRequestReason?: string;
+  receiptImage?: string; // Base64 or image placeholder
+  receiptDetails?: {
+    txId: string;
+    amount: number;
+    date: string;
+    sender: string;
+  };
+  meetingLink?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface ClinicalRecord {
+  id: string;
+  clinicId: string; // Multi-tenant link
+  patientId: string;
+  patientName: string;
+  psychologistId: string;
+  psychologistName?: string;
+  notes: string;
+  isConfidential: boolean;
+  locked: boolean; // Immutable locked state
+  hash?: string; // Mock digital signature/hash for law enforcement compliance
+  createdAt: string;
+}
+

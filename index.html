@@ -10,22 +10,15 @@
         .card { background: #1c2541; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); max-width: 450px; width: 100%; border: 1px solid #3a506b; }
         h1 { color: #64dfdf; margin: 0 0 5px 0; font-size: 26px; font-weight: 700; text-transform: uppercase; text-align: center; }
         p.subtitle { color: #8d99ae; margin: 0 0 25px 0; font-size: 13px; text-align: center; }
-        
-        /* Pestañas */
         .tabs { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 1px solid #3a506b; gap: 10px; }
         .tab { padding: 10px 20px; cursor: pointer; color: #8d99ae; font-weight: bold; font-size: 14px; background: none; border: none; transition: all 0.3s; }
         .tab.active { color: #64dfdf; border-bottom: 2px solid #64dfdf; }
-        
         .form-section { display: none; }
         .form-section.active { display: block; }
-        
         label { display: block; font-size: 12px; color: #64dfdf; margin-top: 10px; font-weight: bold; text-align: left; }
         input, select { display: block; width: 100%; padding: 12px 15px; margin: 8px 0 15px 0; border: 1px solid #3a506b; background: #0b1329; color: #ffffff; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        
-        .btn-main { background: #00b4d8; color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: block; text-align: center; }
+        .btn-main { background: #00b4d8; color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; margin-top: 10px; text-transform: uppercase; display: block; text-align: center; }
         .btn-main:hover { background: #0077b6; }
-        
-        /* Panel Maestro */
         #panel-maestro { display: none; width: 100%; max-width: 800px; background: #1c2541; padding: 30px; border-radius: 16px; border: 1px solid #3a506b; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
         .grid-admin { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
         @media(max-width:768px){ .grid-admin { grid-template-columns: 1fr; } }
@@ -37,57 +30,47 @@
 <body>
 
     <div class="container">
-        <!-- PANTALLA DE ACCESO -->
         <div class="card" id="auth-card">
             <h1>Plataforma ÁMATE</h1>
             <p class="subtitle">Ecosistema Global de Salud - MedicalGlobalTech</p>
-            
             <div class="tabs">
-                <button type="button" class="tab active" id="btn-tab-login" onclick="cambiarVista('login')">INICIAR SESIÓN</button>
-                <button type="button" class="tab" id="btn-tab-register" onclick="cambiarVista('register')">REGISTRARSE</button>
+                <button type="button" class="tab active" id="btn-tab-login">INICIAR SESIÓN</button>
+                <button type="button" class="tab" id="btn-tab-register">REGISTRARSE</button>
             </div>
 
-            <!-- SECCIÓN 1: INICIAR SESIÓN -->
             <div id="seccion-login" class="form-section active">
-                <input type="email" id="login-email" placeholder="Ingresa tu correo electrónico" value="wilsonadmin@amate.com">
-                <input type="password" id="login-pass" placeholder="Ingresa tu contraseña secreta" value="AmateGlobal2026*">
-                <button type="button" class="btn-main" onclick="ejecutarLogin()">Entrar a mi Portal</button>
+                <input type="email" id="login-email" placeholder="Ingresa tu correo electrónico">
+                <input type="password" id="login-pass" placeholder="Ingresa tu contraseña secreta">
+                <button type="button" class="btn-main" id="btn-ejecutar-login">Entrar a mi Portal</button>
             </div>
 
-            <!-- SECCIÓN 2: REGISTRO AUTÓNOMO INTELIGENTE -->
             <div id="seccion-register" class="form-section">
                 <label>¿Quién eres?</label>
-                <select id="reg-role" onchange="mostrarRethus(this.value)">
+                <select id="reg-role">
                     <option value="paciente">Paciente (Quiero agendar una cita)</option>
                     <option value="profesional">Profesional de la Salud / Entrenador Físico</option>
                     <option value="clinica">Clínica / IPS / Empresa Arrendataria</option>
                 </select>
-
                 <input type="text" id="reg-name" placeholder="Nombre completo o Razón Social">
                 <input type="email" id="reg-email" placeholder="Correo electrónico institucional">
                 <input type="password" id="reg-pass" placeholder="Crea una contraseña segura">
-                
                 <div id="campo-rethus" style="display:none;">
                     <input type="text" id="reg-id-profesional" placeholder="Registro Médico / Tarjeta Profesional / RETHUS">
                 </div>
-
                 <label>Método de Pago</label>
                 <select id="reg-payment">
                     <option value="pasarela">Pasarela Automática (PSE, Tarjeta) - *Activación Inmediata*</option>
                     <option value="manual">Transferencia Manual (Nequi, Daviplata) - *Aprobación en 24h*</option>
                 </select>
-
-                <button type="button" class="btn-main" onclick="ejecutarRegistro()">Crear mi Cuenta</button>
+                <button type="button" class="btn-main" id="btn-ejecutar-registro">Crear mi Cuenta</button>
             </div>
         </div>
 
-        <!-- PANEL DE CONTROL CENTRALIZADO -->
         <div id="panel-maestro">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #3a506b; padding-bottom:15px; margin-bottom:20px;">
                 <h2 style="color:#64dfdf; margin:0;">🛠️ PANEL GLOBAL DE AUDITORÍA: ÁMATE</h2>
                 <span class="badge">FIREBASE CONEXIÓN: ACTIVA</span>
             </div>
-            
             <div class="grid-admin">
                 <div class="box-info">
                     <h3 style="color:#00b4d8; margin-top:0;">💵 Caja Centralizada (USD)</h3>
@@ -98,7 +81,6 @@
                     <p style="color:#8d99ae; font-size:13px; margin:0;">Acceso denegado a las historias clínicas por confidencialidad (HIPAA / Ley 1581).</p>
                 </div>
             </div>
-
             <h3 style="color:#64dfdf; margin-top:30px; border-top:1px solid #3a506b; padding-top:20px;">🎛️ Bandeja de Solicitudes y Clientes</h3>
             <div id="lista-usuarios" style="margin-top:15px;">
                 <div class="box-info" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -112,50 +94,7 @@
         </div>
     </div>
 
-    <script>
-        function cambiarVista(vista) {
-            var btnLogin = document.getElementById('btn-tab-login');
-            var btnRegister = document.getElementById('btn-tab-register');
-            var secLogin = document.getElementById('seccion-login');
-            var secRegister = document.getElementById('seccion-register');
-
-            if (vista === 'login') {
-                btnLogin.className = "tab active";
-                btnRegister.className = "tab";
-                secLogin.className = "form-section active";
-                secRegister.className = "form-section";
-            } else {
-                btnLogin.className = "tab";
-                btnRegister.className = "tab active";
-                secLogin.className = "form-section";
-                secRegister.className = "form-section active";
-            }
-        }
-
-        function mostrarRethus(valor) {
-            document.getElementById('campo-rethus').style.display = (valor === 'profesional') ? 'block' : 'none';
-        }
-
-        var contador = 1;
-        function ejecutarRegistro() {
-            var nombre = document.getElementById('reg-name').value;
-            var correo = document.getElementById('reg-email').value;
-            var rol = document.getElementById('reg-role').value;
-            var pago = document.getElementById('reg-payment').value;
-            
-            if (!nombre || !correo) { alert("Diligencia los campos obligatorios."); return; }
-            contador++;
-            var bloque = "";
-            
-            if (pago === 'pasarela') {
-                alert("¡Registro Exitoso!\nPago aprobado por pasarela electrónica. Cuenta activa de inmediato.");
-                bloque = '<div class="box-info" style="margin-bottom:10px;"><h4>'+nombre+'</h4><p>Rol: '+rol+' | Pago: Pasarela</p><p style="color:#64dfdf; font-weight:bold;">Estado: ACTIVO</p></div>';
-            } else {
-                alert("¡Registro Recibido!\nPago manual por transferencia. Tu cuenta está en revisión hasta aprobación.");
-                bloque = '<div class="box-info" style="margin-bottom:10px;"><h4>'+nombre+'</h4><p>Rol: '+rol+' | Pago: Manual</p><p style="color:#e63946; font-weight:bold;" id="txt-status-'+contador+'">Estado: PENDIENTE DE VALIDACIÓN</p><button class="btn-action" style="margin-top:10px;" onclick="aprobarManual('+contador+')">Validar Pago y Dar Acceso</button></div>';
-            }
-            document.getElementById('lista-usuarios').innerHTML += bloque;
-            cambiarVista('login');
-        }
-
-        function ejecutarLogin() {
+    <!-- Llamamos al motor externo para burlar el bloqueo de Vercel -->
+    <script src="script.js"></script>
+</body>
+</html>

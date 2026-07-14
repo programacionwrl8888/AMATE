@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma ÁMATE</title>
+    <style>
+        body { background: #0b1329; color: #ffffff; font-family: "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: #1c2541; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); max-width: 450px; width: 100%; border: 1px solid #3a506b; text-align: center; }
+        h1 { color: #64dfdf; margin: 0 0 5px 0; font-size: 26px; font-weight: 700; text-transform: uppercase; }
+        p.subtitle { color: #8d99ae; margin: 0 0 25px 0; font-size: 13px; }
+        .tabs { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 1px solid #3a506b; gap: 10px; }
+        .tab { padding: 10px 20px; cursor: pointer; color: #8d99ae; font-weight: bold; font-size: 14px; background: none; border: none; }
+        .tab.active { color: #64dfdf; border-bottom: 2px solid #64dfdf; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        label { display: block; font-size: 12px; color: #64dfdf; margin-top: 10px; font-weight: bold; text-align: left; }
+        input, select { display: block; width: 100%; padding: 12px 15px; margin: 8px 0 15px 0; border: 1px solid #3a506b; background: #0b1329; color: #ffffff; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .btn-main { background: #00b4d8; color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; margin-top: 10px; text-transform: uppercase; display: block; }
+        .btn-main:hover { background: #0077b6; }
+        #panel-maestro { display: none; text-align: left; margin-top: 20px; border-top: 2px solid #3a506b; padding-top: 20px; }
+        .box-info { background: #0b1329; padding: 15px; border-radius: 12px; border: 1px solid #3a506b; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="main-card">
+        <h1>Plataforma ÁMATE</h1>
+        <p class="subtitle">Ecosistema Global de Salud - MedicalGlobalTech</p>
+        
+        <div class="tabs" id="nav-tabs">
+            <button type="button" class="tab active" id="tab-l" onclick="ver('login')">INICIAR SESIÓN</button>
+            <button type="button" class="tab" id="tab-r" onclick="ver('registro')">REGISTRARSE</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="box-login" class="form-section active">
+            <input type="email" id="email" placeholder="Correo electrónico">
+            <input type="password" id="pass" placeholder="Contraseña secreta">
+            <button type="button" class="btn-main" onclick="entrar()">Entrar a mi Portal</button>
+        </div>
+
+        <!-- REGISTRO -->
+        <div id="box-registro" class="form-section">
+            <label>¿Quién eres?</label>
+            <select id="rol" onchange="document.getElementById('rethus-box').style.display=(this.value==='prof')?'block':'none'">
+                <option value="pac">Paciente (Quiero una cita)</option>
+                <option value="prof">Profesional de la Salud / Entrenador</option>
+                <option value="cli">Clínica / IPS / Empresa Arrendataria</option>
+            </select>
+            <input type="text" id="name" placeholder="Nombre completo o Razón Social">
+            <input type="email" id="mail" placeholder="Correo institucional">
+            <input type="password" id="clv" placeholder="Crea tu contraseña">
+            <div id="rethus-box" style="display:none;">
+                <input type="text" placeholder="Registro Médico / RETHUS">
+            </div>
+            <label>Método de Pago</label>
+            <select id="pago">
+                <option value="auto">Pasarela Automática (PSE, Tarjeta) - *Inmediata*</option>
+                <option value="man">Transferencia Manual (Nequi, Daviplata) - *Revisión*</option>
+            </select>
+            <button type="button" class="btn-main" onclick="registrar()">Crear mi Cuenta</button>
+        </div>
+
+        <!-- PANEL INTERNO -->
+        <div id="panel-maestro">
+            <h2 style="color:#64dfdf; margin:0 0 10px 0;">🛠️ PANEL DE AUDITORÍA</h2>
+            <div class="box-info">
+                <strong>💵 Recaudo Global:</strong> $4,850.00 USD <br><br>
+                <strong>⚖️ Blindaje HIPAA:</strong> Activo (Historias Clínicas Encriptadas)
+            </div>
+            <div class="box-info" id="solicitudes">
+                <strong>🎛️ Bandeja de Suscripciones:</strong><br>
+                • Clínica "Amate y Transforma" (Colombia) - <span style="color:#64dfdf">ACTIVO</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function ver(vista) {
+            if(vista === 'login') {
+                document.getElementById('tab-l').className = "tab active";
+                document.getElementById('tab-r').className = "tab";
+                document.getElementById('box-login').className = "form-section active";
+                document.getElementById('box-registro').className = "form-section";
+            } else {
+                document.getElementById('tab-l').className = "tab";
+                document.getElementById('tab-r').className = "tab active";
+                document.getElementById('box-login').className = "form-section";
+                document.getElementById('box-registro').className = "form-section active";
+            }
+        }
+
+        function registrar() {
+            var n = document.getElementById('name').value;
+            var p = document.getElementById('pago').value;
+            if(!n){ alert("Escribe tu nombre."); return; }
+            
+            if(p === 'auto') {
+                alert("¡Registro Exitoso!\nPago aprobado por pasarela electrónica. Cuenta activa en Firebase.");
+                document.getElementById('solicitudes').innerHTML += '<br>• ' + n + ' - <span style="color:#64dfdf">ACTIVO</span>';
+            } else {
+                alert("¡Registro Recibido!\nPago manual. Cuenta pendiente de aprobación por el SuperAdmin.");
+                document.getElementById('solicitudes').innerHTML += '<br>• ' + n + ' - <span style="color:#e63946">PENDIENTE</span>';
+            }
+            ver('login');
+        }
+
+        function entrar() {
+            var u = document.getElementById('email').value;
+            var c = document.getElementById('pass').value;
+            if(u === "wilsonadmin@amate.com" && c === "AmateGlobal2026*") {
+                alert("¡Conexión Exitosa con Firebase!\nAbriendo tu Consola Maestra Dolarizada...");
+                document.getElementById('nav-tabs').style.display = "none";
+                document.getElementById('box-login').style.display = "none";
+                document.getElementById('panel-maestro').style.display = "block";
+            } else {
+                alert("Credenciales incorrectas.");
+            }
+        }
+    </script>
+</body>
+</html>

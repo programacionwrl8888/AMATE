@@ -1,0 +1,8 @@
+{
+  "name": "amate",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "mkdir -p dist && [ -f index.html ] && cp index.html dist/index.html || echo 'Plataforma AMATE' > dist/index.html"
+  }
+}
